@@ -2,13 +2,13 @@ locals {
   oss_object_key      = "outputs/${var.aws_region}/${var.config.instance_name}.json"
   local_oss_file_name = "shadowsocks-configs/${var.aws_region}-${var.config.instance_name}.json"
   shadowsocks_libev_config = {
-    "server" = ["0.0.0.0"],
-    "mode" : "tcp_and_udp",
+    "server"      = ["0.0.0.0"],
+    "mode"        = "tcp_and_udp",
     "server_port" = var.config.shadowsocks_libev_port,
     "local_port"  = 1080,
     "password"    = random_password.password.result,
-    "timeout" : 60,
-    "method" : var.config.shadowsocks_libev_method
+    "timeout"     = 60,
+    "method"      = var.config.shadowsocks_libev_method
   }
 }
 
