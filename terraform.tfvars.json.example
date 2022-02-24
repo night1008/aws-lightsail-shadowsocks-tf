@@ -1,11 +1,11 @@
 {
-  "alicloud_bucket": "aws-lightsail-terraform",
-  "aws_region": "ap-northeast-1",
+  "output_oss_bucket": "aws-lightsail-terraform",
   "instances": [
     {
+      "region": "ap-northeast-1",
       "instance_name": "vpn-1",
       "availability_zone": "ap-northeast-1a",
-      "create_static_ip": true,
+      "create_static_ip": false,
       "shadowsocks_libev_port": 8388,
       "shadowsocks_libev_password_length": 10,
       "shadowsocks_libev_method": "chacha20-ietf-poly1305"

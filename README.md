@@ -10,7 +10,7 @@ use terraform manage shadowsocks on aws lightsail
 
 ### 注意点
 1. 当前 oss backend 需要和 variables.tf 的 alicloud_bucket 指定同一个 bucket
-2. 当前只能在一个 aws region 内建立多个实例
+2. 可以在任意 aws region 内建立多个实例
 
 ### 执行命令
 
@@ -48,4 +48,5 @@ terraform apply
 
 ### TODO
 - [ ] 输出 oss config file url
-- [ ] 一次开启多个地区实例
+- [x] 一次开启多个地区实例
+- [ ] 一个实例开启多个 shadowsocks

@@ -1,6 +1,6 @@
 locals {
-  oss_object_key      = "outputs/${var.aws_region}/${var.config.instance_name}.json"
-  local_oss_file_name = "shadowsocks-configs/${var.aws_region}-${var.config.instance_name}.json"
+  output_oss_object_key  = "outputs/${var.config.region}/${var.config.instance_name}.json"
+  local_output_file_name = "shadowsocks-configs/${var.config.region}-${var.config.instance_name}.json"
   shadowsocks_libev_config = {
     "server"      = ["0.0.0.0"],
     "mode"        = "tcp_and_udp",
@@ -82,17 +82,17 @@ resource "aws_lightsail_instance_public_ports" "instance" {
 }
 
 # resource "alicloud_oss_bucket" "instance" {
-#   bucket = var.oss_bucket
+#   bucket = var.output_oss_bucket
 #   acl    = "private"
 # }
 
 resource "alicloud_oss_bucket_object" "object" {
-  bucket  = var.oss_bucket
-  key     = local.oss_object_key
+  bucket  = var.output_oss_bucket
+  key     = local.output_oss_object_key
   content = jsonencode({ "shadowsocks_config" = local.shadowsocks_libev_config, "public_ip_address" = aws_lightsail_instance.instance.public_ip_address, "static_ip" = var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : "" })
 
   provisioner "local-exec" {
-    command = "./download-oss-file.sh ${var.oss_bucket} ${local.oss_object_key} ${local.local_oss_file_name}"
+    command = "./download-oss-file.sh ${var.output_oss_bucket} ${local.output_oss_object_key} ${local.local_output_file_name}"
   }
 
   depends_on = [
