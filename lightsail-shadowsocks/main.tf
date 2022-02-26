@@ -86,7 +86,13 @@ resource "alicloud_oss_bucket_object" "object" {
     "shadowsocks_config" = local.shadowsocks_libev_config,
     "public_ip_address"  = aws_lightsail_instance.instance.public_ip_address,
     "static_ip"          = var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : ""
-    "ss_url"             = format("ss://%s#%s", base64encode(format("%s:%s@%s:%d", var.config.shadowsocks_libev_method, random_password.password.result, var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : aws_lightsail_instance.instance.public_ip_address, var.config.shadowsocks_libev_port)), format("%s-%s", var.config.region, var.config.instance_name))
+    "ss_url" = format(
+      "ss://%s@%s:%d#%s",
+      base64encode(format("%s:%s", var.config.shadowsocks_libev_method, random_password.password.result)),
+      var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : aws_lightsail_instance.instance.public_ip_address,
+      var.config.shadowsocks_libev_port,
+      format("%s-%s", var.config.region, var.config.instance_name)
+    )
   })
 
   provisioner "local-exec" {
