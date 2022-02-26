@@ -60,13 +60,6 @@ resource "aws_lightsail_instance" "instance" {
 resource "aws_lightsail_instance_public_ports" "instance" {
   instance_name = aws_lightsail_instance.instance.name
 
-  # for test
-  # provisioner "local-exec" {
-  #   command = <<EOF
-  #   echo ${jsonencode({"shadowsocks-config"=local.shadowsocks_libev_config, "public_ip_address"=aws_lightsail_instance.instance.public_ip_address, "static_ip"=var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address:""})} > ${var.instance_name}.json
-  #   EOF
-  # }
-
   port_info {
     protocol  = "all"
     from_port = 0

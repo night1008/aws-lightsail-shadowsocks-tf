@@ -22,4 +22,9 @@ variable "config" {
     shadowsocks_libev_password_length = 10
     shadowsocks_libev_method          = "chacha20-ietf-poly1305"
   }
+
+  validation {
+    condition     = var.config.region == substr(var.config.availability_zone, 0, length(var.config.availability_zone) - 1)
+    error_message = "The instance availability_zone must be in the same region."
+  }
 }
