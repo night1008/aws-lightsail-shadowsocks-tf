@@ -83,6 +83,7 @@ resource "alicloud_oss_bucket_object" "object" {
   bucket = var.output_oss_bucket
   key    = local.output_oss_object_key
   content = jsonencode({
+    "instance_name"      = format("%s-%s", var.config.region, var.config.instance_name),
     "shadowsocks_config" = local.shadowsocks_libev_config,
     "public_ip_address"  = aws_lightsail_instance.instance.public_ip_address,
     "static_ip"          = var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : ""
