@@ -25,7 +25,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Download oss file
-        run: ../download-oss-file.sh inputs/terraform.tfvars.json terraform.tfvars.json
+        run: ../../download-oss-file.sh inputs/terraform.tfvars.json terraform.tfvars.json
         env:
           ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
           ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
