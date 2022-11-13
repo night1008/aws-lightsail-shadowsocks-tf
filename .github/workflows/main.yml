@@ -34,5 +34,3 @@ jobs:
 
       - name: Run a one-line script
         run: cat terraform.tfvars.json
-        with:
-          path: terraform.tfvars.json
