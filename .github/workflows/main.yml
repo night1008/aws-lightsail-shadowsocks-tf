@@ -23,14 +23,22 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Runs a single command using the runners shell
-      - name: Download oss file
-        run: ./download-oss-file.sh inputs/terraform.tfvars.json terraform.tfvars.json
-        env:
-          ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
-          ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
-          ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
-          ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
+      # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
 
-      - name: Run a one-line script
-        run: cat terraform.tfvars.json
+      # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+      - name: Terraform Init
+        run: terraform init
+
+      # # Runs a single command using the runners shell
+      # - name: Download oss file
+      #   run: ./download-oss-file.sh inputs/terraform.tfvars.json terraform.tfvars.json
+      #   env:
+      #     ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
+      #     ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
+      #     ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
+      #     ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
+
+      # - name: Run a one-line script
+      #   run: cat terraform.tfvars.json
