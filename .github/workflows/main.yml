@@ -43,8 +43,6 @@ jobs:
           ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
           ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
           TF_VAR_ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
-          TF_VAR_ALICLOUD_STATE_PREFIX: ${{ secrets.ALICLOUD_STATE_PREFIX }}
-
 
       # Runs a single command using the runners shell
       - name: Download Terraform input file
