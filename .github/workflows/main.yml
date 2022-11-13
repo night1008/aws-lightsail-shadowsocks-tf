@@ -12,6 +12,12 @@ on:
   workflow_dispatch:
 
 env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
+  ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
+  ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
+  ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
   TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -38,20 +44,10 @@ jobs:
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: terraform init -backend-config="bucket=${{ env.ALICLOUD_BUCKET }}"
-        env:
-          ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
-          ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
-          ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
-          ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
 
       # Runs a single command using the runners shell
       - name: Download Terraform input file
         run: ./download-oss-file.sh inputs/terraform.tfvars.json terraform.tfvars.json
-        env:
-          ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
-          ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
-          ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
-          ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
 
       # for test
       # - name: Run a one-line script
@@ -61,9 +57,4 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -input=false
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
-          ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
-          ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
           TF_VAR_output_oss_bucket: ${{ secrets.ALICLOUD_BUCKET }}
