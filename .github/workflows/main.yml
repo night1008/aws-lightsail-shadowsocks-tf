@@ -37,10 +37,17 @@ jobs:
 
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -backend-config="bucket=${{ env.TF_VAR_ALICLOUD_BUCKET }}" -backend-config="prefix=${{ env.TF_VAR_ALICLOUD_STATE_PREFIX }}"
+        env:
+          ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
+          ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
+          ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
+          TF_VAR_ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
+          TF_VAR_ALICLOUD_STATE_PREFIX: ${{ secrets.ALICLOUD_STATE_PREFIX }}
+
 
       # Runs a single command using the runners shell
-      - name: Download oss file
+      - name: Download Terraform input file
         run: ./download-oss-file.sh inputs/terraform.tfvars.json terraform.tfvars.json
         env:
           ALICLOUD_ACCESS_KEY: ${{ secrets.ALICLOUD_ACCESS_KEY }}
