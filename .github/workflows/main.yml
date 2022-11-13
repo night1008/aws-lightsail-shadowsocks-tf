@@ -18,7 +18,6 @@ env:
   ALICLOUD_SECRET_KEY: ${{ secrets.ALICLOUD_SECRET_KEY }}
   ALICLOUD_REGION: ${{ secrets.ALICLOUD_REGION }}
   ALICLOUD_BUCKET: ${{ secrets.ALICLOUD_BUCKET }}
-  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -31,11 +30,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      - uses: actions/cache@v2
-        with:
-          key: ${{ runner.os }}-terraform-plugin-cache
-          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
 
       # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
       - name: Setup Terraform
