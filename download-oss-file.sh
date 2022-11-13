@@ -3,10 +3,10 @@
 accessKey="$ALICLOUD_ACCESS_KEY"
 accessSecret="$ALICLOUD_SECRET_KEY"
 host="oss-${ALICLOUD_REGION}.aliyuncs.com"
+bucket="${ALICLOUD_BUCKET}"
 
-bucket="$1"
-source="$2"
-dest="$3"
+source="$1"
+dest="$2"
 
 osshost=$bucket.$host
 resource="/${bucket}/${source}"
