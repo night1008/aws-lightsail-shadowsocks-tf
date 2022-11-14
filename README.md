@@ -17,11 +17,11 @@ use terraform manage shadowsocks on aws lightsail
 ```
 export AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=xxx
 
-export ALICLOUD_ACCESS_KEY=xxx ALICLOUD_SECRET_KEY=xxx ALICLOUD_REGION=cn-hangzhou
+export ALICLOUD_ACCESS_KEY=xxx ALICLOUD_SECRET_KEY=xxx ALICLOUD_REGION=cn-hangzhou ALICLOUD_BUCKET=aws-lightsail-terraform
 
 cp terraform.tfvars.json.example terraform.tfvars.json
 
-terraform init -backend-config="bucket=aws-lightsail-terraform" -backend-config="prefix=state"
+terraform init -backend-config="bucket=aws-lightsail-terraform"
 
 terraform apply
 ```
@@ -34,7 +34,7 @@ terraform apply
 
 ```
 /aws-lightsail-terraform
-  /state
+  /env:
     /terraform.tfstate
   /outputs
     /ap-northeast-1
