@@ -132,6 +132,9 @@ module "lightsail-shadowsocks-ap-southeast-1" {
 
   for_each = lookup(local.region_instances, "ap-southeast-1", {})
 
+  config            = each.value
+  output_oss_bucket = var.output_oss_bucket
+
   providers = {
     aws = aws.ap-southeast-1
   }
