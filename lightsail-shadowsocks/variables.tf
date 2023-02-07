@@ -1,8 +1,3 @@
-variable "output_oss_bucket" {
-  type    = string
-  default = "aws-lightsail-terraform"
-}
-
 variable "config" {
   type = object({
     region                            = string # aws lightsail region

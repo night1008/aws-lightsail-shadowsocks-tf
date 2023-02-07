@@ -74,13 +74,7 @@ resource "aws_lightsail_instance_public_ports" "instance" {
   ]
 }
 
-# resource "alicloud_oss_bucket" "instance" {
-#   bucket = var.output_oss_bucket
-#   acl    = "private"
-# }
-
 resource "alicloud_oss_bucket_object" "object" {
-  bucket = var.output_oss_bucket
   key    = local.output_oss_object_key
   content = jsonencode({
     "instance_name"      = format("%s-%s", var.config.region, var.config.instance_name),
@@ -97,7 +91,7 @@ resource "alicloud_oss_bucket_object" "object" {
   })
 
   provisioner "local-exec" {
-    command = "./download-oss-file.sh ${var.output_oss_bucket} ${local.output_oss_object_key} ${local.local_output_file_name}"
+    command = "./download-oss-file.sh ${local.output_oss_object_key} ${local.local_output_file_name}"
   }
 
   depends_on = [

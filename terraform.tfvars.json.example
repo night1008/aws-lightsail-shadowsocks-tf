@@ -1,5 +1,4 @@
 {
-  "output_oss_bucket": "aws-lightsail-terraform",
   "instances": [
     {
       "region": "ap-northeast-1",
