@@ -18,9 +18,15 @@ resource "aws_lightsail_static_ip_attachment" "instance" {
   instance_name  = aws_lightsail_instance.instance.id
 }
 
+resource "random_uuid" "static_ip_name" {}
+
 resource "aws_lightsail_static_ip" "instance" {
   count = var.config.create_static_ip ? 1 : 0
-  name  = format("%s-%s", "static-ip", var.config.instance_name)
+  name  = format("%s-%s", "static-ip", random_uuid.static_ip_name.result)
+
+  depends_on = [
+    random_uuid.static_ip_name
+  ]
 }
 
 resource "random_password" "password" {
