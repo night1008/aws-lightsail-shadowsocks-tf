@@ -94,7 +94,6 @@ module "lightsail-shadowsocks-ap-northeast-1" {
   for_each = lookup(local.region_instances, "ap-northeast-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.ap-northeast-1
@@ -107,7 +106,6 @@ module "lightsail-shadowsocks-ap-northeast-2" {
   for_each = lookup(local.region_instances, "ap-northeast-2", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.ap-northeast-2
@@ -120,7 +118,6 @@ module "lightsail-shadowsocks-ap-south-1" {
   for_each = lookup(local.region_instances, "ap-south-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.ap-south-1
@@ -133,7 +130,6 @@ module "lightsail-shadowsocks-ap-southeast-1" {
   for_each = lookup(local.region_instances, "ap-southeast-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.ap-southeast-1
@@ -146,7 +142,6 @@ module "lightsail-shadowsocks-ap-southeast-2" {
   for_each = lookup(local.region_instances, "ap-southeast-2", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.ap-southeast-2
@@ -159,7 +154,6 @@ module "lightsail-shadowsocks-ca-central-1" {
   for_each = lookup(local.region_instances, "ca-central-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.ca-central-1
@@ -172,7 +166,6 @@ module "lightsail-shadowsocks-eu-central-1" {
   for_each = lookup(local.region_instances, "eu-central-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.eu-central-1
@@ -185,7 +178,6 @@ module "lightsail-shadowsocks-eu-west-1" {
   for_each = lookup(local.region_instances, "eu-west-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.eu-west-1
@@ -198,7 +190,6 @@ module "lightsail-shadowsocks-eu-west-2" {
   for_each = lookup(local.region_instances, "eu-west-2", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.eu-west-2
@@ -211,7 +202,6 @@ module "lightsail-shadowsocks-eu-west-3" {
   for_each = lookup(local.region_instances, "eu-west-3", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.eu-west-3
@@ -224,7 +214,6 @@ module "lightsail-shadowsocks-us-east-1" {
   for_each = lookup(local.region_instances, "us-east-1", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.us-east-1
@@ -237,7 +226,6 @@ module "lightsail-shadowsocks-us-east-2" {
   for_each = lookup(local.region_instances, "us-east-2", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.us-east-2
@@ -250,7 +238,6 @@ module "lightsail-shadowsocks-us-west-2" {
   for_each = lookup(local.region_instances, "us-west-2", {})
 
   config            = each.value
-  output_oss_bucket = var.output_oss_bucket
 
   providers = {
     aws = aws.us-west-2
