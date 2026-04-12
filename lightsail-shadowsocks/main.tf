@@ -38,7 +38,7 @@ resource "random_password" "password" {
 resource "aws_lightsail_instance" "instance" {
   name              = format("%s-%s", "instance", var.config.instance_name)
   availability_zone = var.config.availability_zone
-  blueprint_id      = "ubuntu_20_04"
+  blueprint_id      = "ubuntu_24_04"
   bundle_id         = "nano_2_0"
   # key_pair_name     = "some_key_name"
 
