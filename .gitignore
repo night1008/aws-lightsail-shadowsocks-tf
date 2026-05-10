@@ -30,5 +30,5 @@ override.tf.json
 
 terraform.tfvars.json
 
-# local shadowsocks config output file
-shadowsocks-configs
+# local config output file
+outputs/

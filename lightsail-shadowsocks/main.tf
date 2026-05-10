@@ -1,6 +1,7 @@
 locals {
-  output_oss_object_key  = "outputs/${var.config.region}/${var.config.instance_name}.json"
-  local_output_file_name = "shadowsocks-configs/${var.config.region}-${var.config.instance_name}.json"
+  output_oss_object_key  = "outputs/shadowsocks-configs/${var.config.region}/${var.config.instance_name}.json"
+  local_output_file_name = "outputs/shadowsocks-configs/${var.config.region}-${var.config.instance_name}.json"
+  
   shadowsocks_libev_config = {
     "server"      = ["0.0.0.0"],
     "mode"        = "tcp_and_udp",
@@ -96,12 +97,17 @@ resource "alicloud_oss_bucket_object" "object" {
       format("%s-%s", var.config.region, var.config.instance_name)
     )
   })
-
-  provisioner "local-exec" {
-    command = "./download-oss-file.sh ${local.output_oss_object_key} ${local.local_output_file_name}"
-  }
-
+  
   depends_on = [
     aws_lightsail_instance_public_ports.instance
+  ]
+}
+
+resource "local_file" "object" {
+  filename = local.local_output_file_name
+  content  = alicloud_oss_bucket_object.object.content
+
+  depends_on = [
+    alicloud_oss_bucket_object.object
   ]
 }

@@ -4,7 +4,7 @@ variable "output_oss_bucket" {
   default     = "aws-lightsail-terraform"
 }
 
-variable "instances" {
+variable "shadowsocks_instances" {
   description = "aws lightsail instance config"
   type = list(object({
     region                            = string # aws lightsail region
@@ -25,7 +25,24 @@ variable "instances" {
     shadowsocks_libev_method          = "chacha20-ietf-poly1305"
   }]
   validation {
-    condition     = length(var.instances) == length(toset([for s in var.instances : format("%s-%s", s.region, s.instance_name)]))
-    error_message = "The instances instance_name must be unique on a region."
+    condition     = length(var.shadowsocks_instances) == length(toset([for s in var.shadowsocks_instances : format("%s-%s", s.region, s.instance_name)]))
+    error_message = "The shadowsocks_instances instance_name must be unique on a region."
+  }
+}
+
+variable "hysteria_instances" {
+  description = "aws lightsail hysteria2 instance config"
+  type = list(object({
+    region            = string # aws lightsail region
+    instance_name     = string # aws lightsail instance name
+    availability_zone = string # aws lightsail instance availability zone
+    create_static_ip  = bool   # create lightsail static ip
+    password_length   = number # hysteria2 password length
+    proxy_url         = string # masquerade proxy url, e.g. https://bing.com
+  }))
+  default = []
+  validation {
+    condition     = length(var.hysteria_instances) == length(toset([for s in var.hysteria_instances : format("%s-%s", s.region, s.instance_name)]))
+    error_message = "The hysteria_instances instance_name must be unique on a region."
   }
 }

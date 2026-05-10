@@ -29,18 +29,25 @@ terraform apply
 ### 执行结果
 > 意外：有几个实例输出几个 oss 配置文件，实例删除时 oss 配置文件也会删除
 
-每个实例的 ip 信息和 shadowsocks 的配置信息会下载到当前 shadowsocks-configs 目录下，
-同时也会存储到 oss 文件中，oss 输出文件目录如下
+每个实例的 ip 信息和 shadowsocks 的配置信息会同时写入 OSS 和本地 `outputs/` 目录。
+本地文件由 Terraform 直接生成，不再依赖额外的下载脚本，目录结构如下：
 
 ```
 /aws-lightsail-terraform
-  /env:
-    /terraform.tfstate
-  /outputs
+  /outputs/shadowsocks-configs
     /ap-northeast-1
       /vpn-1.json
       /vpn-2.json
+  /outputs/hysteria-configs
+    /ap-northeast-1
+      /hy2-1.json
 ```
+
+shadowsocks 本地输出文件位于 `outputs/shadowsocks-configs/${region}-${instance_name}.json`。
+
+hysteria2 实例对应的本地输出文件位于 `outputs/hysteria-configs/${region}-${instance_name}.json`，
+其中 `hysteria_url` 字段（`hysteria2://...?sni=...&insecure=1#...`）可直接在
+Shadowrocket / Clash / Clash Verge 中通过 URL 导入。
 
 ### 测试工具
 
@@ -50,3 +57,4 @@ terraform apply
 - [ ] 输出 oss config file url
 - [x] 一次开启多个地区实例
 - [ ] 一个实例开启多个 shadowsocks
+- [x] 支持 hysteria2
