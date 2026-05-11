@@ -54,11 +54,11 @@ variable "combined_instances" {
     instance_name                     = string # aws lightsail instance name
     availability_zone                 = string # aws lightsail instance availability zone
     create_static_ip                  = bool   # create lightsail static ip
-    enable_shadowsocks                = bool   # 是否启用 shadowsocks-libev
-    enable_hysteria                   = bool   # 是否启用 hysteria2
+    shadowsocks_enable                = bool # 是否启用 shadowsocks-libev
     shadowsocks_libev_port            = number # shadowsocks-libev config port
     shadowsocks_libev_password_length = number # shadowsocks-libev password length
     shadowsocks_libev_method          = string # shadowsocks-libev config method
+    hysteria_enable                   = bool # 是否启用 hysteria2
     hysteria_password_length          = number # hysteria2 password length
     hysteria_proxy_url                = string # masquerade proxy url, e.g. https://bing.com
   }))

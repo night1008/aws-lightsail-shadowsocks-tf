@@ -10,13 +10,13 @@ variable "config" {
     availability_zone                 = string # aws lightsail instance availability zone
     create_static_ip                  = bool   # create lightsail static ip
     # 协议开关
-    enable_shadowsocks                = bool # 是否启用 shadowsocks-libev
-    enable_hysteria                   = bool # 是否启用 hysteria2
-    # shadowsocks-libev（enable_shadowsocks = true 时生效）
+    shadowsocks_enable                = bool # 是否启用 shadowsocks-libev
+    hysteria_enable                   = bool # 是否启用 hysteria2
+    # shadowsocks-libev（shadowsocks_enable = true 时生效）
     shadowsocks_libev_port            = number # shadowsocks-libev listen port
     shadowsocks_libev_password_length = number # shadowsocks-libev password length
     shadowsocks_libev_method          = string # shadowsocks-libev cipher method
-    # hysteria2（enable_hysteria = true 时生效）
+    # hysteria2（hysteria_enable = true 时生效）
     hysteria_password_length          = number # hysteria2 password length
     hysteria_proxy_url                = string # masquerade proxy url, e.g. https://bing.com
   })
@@ -25,8 +25,8 @@ variable "config" {
     instance_name                     = "test1"
     availability_zone                 = "ap-northeast-1a"
     create_static_ip                  = true
-    enable_shadowsocks                = true
-    enable_hysteria                   = true
+    shadowsocks_enable                = true
+    hysteria_enable                   = true
     shadowsocks_libev_port            = 8388
     shadowsocks_libev_password_length = 10
     shadowsocks_libev_method          = "chacha20-ietf-poly1305"
@@ -40,12 +40,12 @@ variable "config" {
   }
 
   validation {
-    condition     = var.config.enable_shadowsocks || var.config.enable_hysteria
-    error_message = "At least one protocol must be enabled (enable_shadowsocks or enable_hysteria)."
+    condition     = var.config.shadowsocks_enable || var.config.hysteria_enable
+    error_message = "At least one protocol must be enabled (shadowsocks_enable or hysteria_enable)."
   }
 
   validation {
-    condition     = !var.config.enable_hysteria || can(regex("^https?://[^/]+", var.config.hysteria_proxy_url))
-    error_message = "hysteria_proxy_url must be a valid http(s) url when enable_hysteria is true."
+    condition     = !var.config.hysteria_enable || can(regex("^https?://[^/]+", var.config.hysteria_proxy_url))
+    error_message = "hysteria_proxy_url must be a valid http(s) url when hysteria_enable is true."
   }
 }

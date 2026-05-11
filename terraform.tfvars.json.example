@@ -27,11 +27,11 @@
       "instance_name": "combo-1",
       "availability_zone": "ap-northeast-1a",
       "create_static_ip": false,
-      "enable_shadowsocks": true,
-      "enable_hysteria": true,
+      "shadowsocks_enable": true,
       "shadowsocks_libev_port": 8388,
       "shadowsocks_libev_password_length": 10,
       "shadowsocks_libev_method": "chacha20-ietf-poly1305",
+      "hysteria_enable": true,
       "hysteria_password_length": 16,
       "hysteria_proxy_url": "https://bing.com"
     }

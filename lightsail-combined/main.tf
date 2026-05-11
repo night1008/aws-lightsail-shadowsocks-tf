@@ -9,7 +9,7 @@ locals {
   )
 
   # Shadowsocks
-  ss_config = var.config.enable_shadowsocks ? {
+  ss_config = var.config.shadowsocks_enable ? {
     "server"      = ["0.0.0.0"],
     "mode"        = "tcp_and_udp",
     "server_port" = var.config.shadowsocks_libev_port,
@@ -19,7 +19,7 @@ locals {
     "method"      = var.config.shadowsocks_libev_method
   } : null
 
-  ss_url = var.config.enable_shadowsocks ? format(
+  ss_url = var.config.shadowsocks_enable ? format(
     "ss://%s@%s:%d#%s",
     base64encode(format("%s:%s", var.config.shadowsocks_libev_method, random_password.ss_password[0].result)),
     local.ip_address,
@@ -32,7 +32,7 @@ locals {
   proxy_host_with_path = replace(replace(var.config.hysteria_proxy_url, "https://", ""), "http://", "")
   sni                  = split("/", local.proxy_host_with_path)[0]
 
-  hysteria_url = var.config.enable_hysteria ? format(
+  hysteria_url = var.config.hysteria_enable ? format(
     "hysteria2://%s@%s:%d?sni=%s&insecure=1#%s",
     urlencode(random_password.hy_password[0].result),
     local.ip_address,
@@ -60,14 +60,14 @@ resource "aws_lightsail_static_ip" "instance" {
 }
 
 resource "random_password" "ss_password" {
-  count            = var.config.enable_shadowsocks ? 1 : 0
+  count            = var.config.shadowsocks_enable ? 1 : 0
   length           = var.config.shadowsocks_libev_password_length
   special          = true
   override_special = "_%@"
 }
 
 resource "random_password" "hy_password" {
-  count            = var.config.enable_hysteria ? 1 : 0
+  count            = var.config.hysteria_enable ? 1 : 0
   length           = var.config.hysteria_password_length
   special          = true
   override_special = "_%@"
@@ -87,8 +87,8 @@ resource "aws_lightsail_instance" "instance" {
 #!/bin/bash
 set -eux
 
-ENABLE_SS=${var.config.enable_shadowsocks ? "true" : "false"}
-ENABLE_HY=${var.config.enable_hysteria ? "true" : "false"}
+ENABLE_SS=${var.config.shadowsocks_enable ? "true" : "false"}
+ENABLE_HY=${var.config.hysteria_enable ? "true" : "false"}
 
 apt update
 apt install -y curl openssl ca-certificates
@@ -102,7 +102,7 @@ if [ "$ENABLE_SS" = "true" ]; then
   "mode": "tcp_and_udp",
   "server_port": ${var.config.shadowsocks_libev_port},
   "local_port": 1080,
-  "password": "${var.config.enable_shadowsocks ? random_password.ss_password[0].result : ""}",
+  "password": "${var.config.shadowsocks_enable ? random_password.ss_password[0].result : ""}",
   "timeout": 60,
   "method": "${var.config.shadowsocks_libev_method}"
 }
@@ -131,7 +131,7 @@ tls:
 
 auth:
   type: password
-  password: '${var.config.enable_hysteria ? random_password.hy_password[0].result : ""}'
+  password: '${var.config.hysteria_enable ? random_password.hy_password[0].result : ""}'
 
 masquerade:
   type: proxy
@@ -170,15 +170,15 @@ resource "alicloud_oss_bucket_object" "object" {
     "instance_name"      = format("%s-%s", var.config.region, var.config.instance_name),
     "public_ip_address"  = aws_lightsail_instance.instance.public_ip_address,
     "static_ip"          = var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : ""
-    "shadowsocks_config" = var.config.enable_shadowsocks ? local.ss_config : null,
-    "ss_url"             = var.config.enable_shadowsocks ? local.ss_url : null,
-    "hysteria_config" = var.config.enable_hysteria ? {
+    "shadowsocks_config" = var.config.shadowsocks_enable ? local.ss_config : null,
+    "ss_url"             = var.config.shadowsocks_enable ? local.ss_url : null,
+    "hysteria_config" = var.config.hysteria_enable ? {
       "listen"    = local.hysteria_port,
       "password"  = random_password.hy_password[0].result,
       "sni"       = local.sni,
       "proxy_url" = var.config.hysteria_proxy_url,
     } : null,
-    "hysteria_url" = var.config.enable_hysteria ? local.hysteria_url : null,
+    "hysteria_url" = var.config.hysteria_enable ? local.hysteria_url : null,
   })
 
   depends_on = [
