@@ -58,3 +58,4 @@ Shadowrocket / Clash / Clash Verge 中通过 URL 导入。
 - [x] 一次开启多个地区实例
 - [ ] 一个实例开启多个 shadowsocks
 - [x] 支持 hysteria2
+- [x] 一个实例同时开启 shadowsocks + hysteria2

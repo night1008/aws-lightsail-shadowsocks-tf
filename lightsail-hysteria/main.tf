@@ -3,7 +3,7 @@ locals {
   local_output_file_name = "outputs/hysteria-configs/${var.config.region}-${var.config.instance_name}.json"
 
   # 从 https://bing.com[/...] 中解析出主机段，用作自签证书 CN 与客户端 SNI
-  proxy_host_with_path = replace(replace(var.config.proxy_url, "https://", ""), "http://", "")
+  proxy_host_with_path = replace(replace(var.config.hysteria_proxy_url, "https://", ""), "http://", "")
   sni                  = split("/", local.proxy_host_with_path)[0]
 
   hysteria_port = 443
@@ -44,7 +44,7 @@ resource "aws_lightsail_static_ip" "instance" {
 }
 
 resource "random_password" "password" {
-  length           = var.config.password_length
+  length           = var.config.hysteria_password_length
   special          = true
   override_special = "_%@"
 }
@@ -94,7 +94,7 @@ auth:
 masquerade:
   type: proxy
   proxy:
-    url: '${var.config.proxy_url}'
+    url: '${var.config.hysteria_proxy_url}'
     rewriteHost: true
 EOF
 
@@ -131,7 +131,7 @@ resource "alicloud_oss_bucket_object" "object" {
       "listen"    = local.hysteria_port,
       "password"  = random_password.password.result,
       "sni"       = local.sni,
-      "proxy_url" = var.config.proxy_url,
+      "proxy_url" = var.config.hysteria_proxy_url,
     },
     "hysteria_url" = local.hysteria_url,
   })

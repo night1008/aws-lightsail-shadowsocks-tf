@@ -9,16 +9,16 @@ variable "config" {
     instance_name     = string # aws lightsail instance name
     availability_zone = string # aws lightsail instance availability zone
     create_static_ip  = bool   # create lightsail static ip
-    password_length   = number # hysteria2 password length
-    proxy_url         = string # masquerade proxy url, e.g. https://bing.com
+    hysteria_password_length = number # hysteria2 password length
+    hysteria_proxy_url       = string # masquerade proxy url, e.g. https://bing.com
   })
   default = {
     region            = "ap-northeast-1"
     instance_name     = "test1"
     availability_zone = "ap-northeast-1a"
     create_static_ip  = true
-    password_length   = 16
-    proxy_url         = "https://bing.com"
+    hysteria_password_length = 16
+    hysteria_proxy_url       = "https://bing.com"
   }
 
   validation {
@@ -27,7 +27,7 @@ variable "config" {
   }
 
   validation {
-    condition     = can(regex("^https?://[^/]+", var.config.proxy_url))
-    error_message = "proxy_url must be a valid http(s) url."
+    condition     = can(regex("^https?://[^/]+", var.config.hysteria_proxy_url))
+    error_message = "hysteria_proxy_url must be a valid http(s) url."
   }
 }
