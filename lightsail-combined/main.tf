@@ -19,7 +19,7 @@ locals {
     "method"      = var.config.shadowsocks_libev_method
   } : null
 
-  ss_url = var.config.shadowsocks_enable ? format(
+  shadowsocks_url = var.config.shadowsocks_enable ? format(
     "ss://%s@%s:%d#%s",
     base64encode(format("%s:%s", var.config.shadowsocks_libev_method, random_password.ss_password[0].result)),
     local.ip_address,
@@ -38,6 +38,21 @@ locals {
     local.ip_address,
     local.hysteria_port,
     local.sni,
+    format("%s-%s", var.config.region, var.config.instance_name)
+  ) : null
+
+  # Xray VLESS+REALITY
+  xray_proxy_host_with_path = replace(replace(var.config.xray_proxy_url, "https://", ""), "http://", "")
+  xray_dest_host            = split("/", local.xray_proxy_host_with_path)[0]
+  xray_dest                 = "${local.xray_dest_host}:443"
+
+  xray_url = var.config.xray_enable ? format(
+    "vless://%s@%s:%d?encryption=none&flow=xtls-rprx-vision&type=tcp&security=reality&sni=%s&fp=chrome&pbk=%s#%s",
+    random_uuid.xray_user_id[0].result,
+    local.ip_address,
+    var.config.xray_port,
+    local.xray_dest_host,
+    var.config.xray_public_key,
     format("%s-%s", var.config.region, var.config.instance_name)
   ) : null
 }
@@ -73,6 +88,10 @@ resource "random_password" "hy_password" {
   override_special = "_%@"
 }
 
+resource "random_uuid" "xray_user_id" {
+  count = var.config.xray_enable ? 1 : 0
+}
+
 resource "aws_lightsail_instance" "instance" {
   name              = format("%s-%s", "instance", var.config.instance_name)
   availability_zone = var.config.availability_zone
@@ -89,6 +108,7 @@ set -eux
 
 ENABLE_SS=${var.config.shadowsocks_enable ? "true" : "false"}
 ENABLE_HY=${var.config.hysteria_enable ? "true" : "false"}
+ENABLE_XRAY=${var.config.xray_enable ? "true" : "false"}
 
 apt update
 apt install -y curl openssl ca-certificates
@@ -143,6 +163,52 @@ EOF
   systemctl enable hysteria-server
   systemctl restart hysteria-server
 fi
+
+# ── Xray VLESS+REALITY ────────────────────────────────────────────────────────
+if [ "$ENABLE_XRAY" = "true" ]; then
+  curl -fsSL https://raw.githubusercontent.com/XTLS/Xray-install/main/install-release.sh -o /tmp/xray2_install.sh
+  bash /tmp/xray2_install.sh
+
+  cat > /usr/local/etc/xray/config.json <<'EOF'
+{
+  "inbounds": [
+    {
+      "port": ${var.config.xray_port},
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${var.config.xray_enable ? random_uuid.xray_user_id[0].result : ""}",
+            "flow": "xtls-rprx-vision"
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "${local.xray_dest}",
+          "xver": 0,
+          "serverNames": ["${local.xray_dest_host}"],
+          "privateKey": "${var.config.xray_private_key}",
+          "shortIds": [""]
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom"
+    }
+  ]
+}
+EOF
+
+  systemctl enable xray
+  systemctl restart xray
+fi
 EOT
 }
 
@@ -171,7 +237,7 @@ resource "alicloud_oss_bucket_object" "object" {
     "public_ip_address"  = aws_lightsail_instance.instance.public_ip_address,
     "static_ip"          = var.config.create_static_ip ? aws_lightsail_static_ip.instance[0].ip_address : ""
     "shadowsocks_config" = var.config.shadowsocks_enable ? local.ss_config : null,
-    "ss_url"             = var.config.shadowsocks_enable ? local.ss_url : null,
+    "shadowsocks_url"     = var.config.shadowsocks_enable ? local.shadowsocks_url : null,
     "hysteria_config" = var.config.hysteria_enable ? {
       "listen"    = local.hysteria_port,
       "password"  = random_password.hy_password[0].result,
@@ -179,6 +245,14 @@ resource "alicloud_oss_bucket_object" "object" {
       "proxy_url" = var.config.hysteria_proxy_url,
     } : null,
     "hysteria_url" = var.config.hysteria_enable ? local.hysteria_url : null,
+    "xray_config" = var.config.xray_enable ? {
+      "port"       = var.config.xray_port,
+      "uuid"       = random_uuid.xray_user_id[0].result,
+      "public_key" = var.config.xray_public_key,
+      "sni"        = local.xray_dest_host,
+      "proxy_url"  = var.config.xray_proxy_url,
+    } : null,
+    "xray_url" = var.config.xray_enable ? local.xray_url : null,
   })
 
   depends_on = [

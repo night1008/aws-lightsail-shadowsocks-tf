@@ -33,7 +33,24 @@
       "shadowsocks_libev_method": "chacha20-ietf-poly1305",
       "hysteria_enable": true,
       "hysteria_password_length": 16,
-      "hysteria_proxy_url": "https://bing.com"
+      "hysteria_proxy_url": "https://bing.com",
+      "xray_enable": false,
+      "xray_port": 443,
+      "xray_proxy_url": "https://www.google.com",
+      "xray_private_key": "",
+      "xray_public_key": ""
+    }
+  ],
+  "xray_instances": [
+    {
+      "region": "ap-northeast-1",
+      "instance_name": "xray-1",
+      "availability_zone": "ap-northeast-1a",
+      "create_static_ip": false,
+      "xray_port": 443,
+      "xray_proxy_url": "https://www.google.com",
+      "xray_private_key": "<用 xray x25519 生成的 Private key>",
+      "xray_public_key": "<用 xray x25519 生成的 Public key>"
     }
   ]
 }

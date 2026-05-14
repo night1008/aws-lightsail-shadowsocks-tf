@@ -51,8 +51,8 @@ func main() {
 		} else {
 			status = "blocked"
 		}
-		fmt.Println(fmt.Sprintf("instance_name: %s, addr: %s is %s.\nss_url: %s\n",
-			addr.InstanceName, tcpStr, status, addr.SsURL))
+		fmt.Printf("instance_name: %s, addr: %s is %s.\nshadowsocks_url: %s\n",
+			addr.InstanceName, tcpStr, status, addr.ShadowsocksURL)
 	}
 }
 
@@ -68,8 +68,8 @@ type PingAddr struct {
 		ServerPort int      `json:"server_port"`
 		Timeout    int      `json:"timeout"`
 	} `json:"shadowsocks_config"`
-	SsURL    string `json:"ss_url"`
-	StaticIP string `json:"static_ip"`
+	ShadowsocksURL string `json:"shadowsocks_url"`
+	StaticIP       string `json:"static_ip"`
 }
 
 func readPingAddrsFromOss(endpoint, accessKeyID, accessKeySecret, bucketName string) ([]*PingAddr, error) {

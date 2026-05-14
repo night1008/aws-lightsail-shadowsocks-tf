@@ -12,6 +12,7 @@ variable "config" {
     # 协议开关
     shadowsocks_enable                = bool # 是否启用 shadowsocks-libev
     hysteria_enable                   = bool # 是否启用 hysteria2
+    xray_enable                       = bool # 是否启用 xray (VLESS+REALITY)
     # shadowsocks-libev（shadowsocks_enable = true 时生效）
     shadowsocks_libev_port            = number # shadowsocks-libev listen port
     shadowsocks_libev_password_length = number # shadowsocks-libev password length
@@ -19,6 +20,11 @@ variable "config" {
     # hysteria2（hysteria_enable = true 时生效）
     hysteria_password_length          = number # hysteria2 password length
     hysteria_proxy_url                = string # masquerade proxy url, e.g. https://bing.com
+    # xray VLESS+REALITY（xray_enable = true 时生效）
+    xray_port                         = number # xray listen port，建议使用 443
+    xray_proxy_url                    = string # REALITY 伪装目标 URL，如 https://www.google.com
+    xray_private_key                  = string # x25519 私钥（base64url，无填充），服务端使用
+    xray_public_key                   = string # x25519 公钥（base64url，无填充），客户端使用
   })
   default = {
     region                            = "ap-northeast-1"
@@ -27,11 +33,16 @@ variable "config" {
     create_static_ip                  = true
     shadowsocks_enable                = true
     hysteria_enable                   = true
+    xray_enable                       = false
     shadowsocks_libev_port            = 8388
     shadowsocks_libev_password_length = 10
     shadowsocks_libev_method          = "chacha20-ietf-poly1305"
     hysteria_password_length          = 10
     hysteria_proxy_url                = "https://bing.com"
+    xray_port                         = 443
+    xray_proxy_url                    = "https://www.google.com"
+    xray_private_key                  = ""
+    xray_public_key                   = ""
   }
 
   validation {
@@ -40,12 +51,41 @@ variable "config" {
   }
 
   validation {
-    condition     = var.config.shadowsocks_enable || var.config.hysteria_enable
-    error_message = "At least one protocol must be enabled (shadowsocks_enable or hysteria_enable)."
+    condition     = var.config.shadowsocks_enable || var.config.hysteria_enable || var.config.xray_enable
+    error_message = "At least one protocol must be enabled (shadowsocks_enable, hysteria_enable, or xray_enable)."
   }
 
   validation {
     condition     = !var.config.hysteria_enable || can(regex("^https?://[^/]+", var.config.hysteria_proxy_url))
     error_message = "hysteria_proxy_url must be a valid http(s) url when hysteria_enable is true."
+  }
+
+  validation {
+    condition     = !var.config.xray_enable || can(regex("^https?://[^/]+", var.config.xray_proxy_url))
+    error_message = "xray_proxy_url must be a valid http(s) URL when xray_enable is true."
+  }
+
+  validation {
+    condition     = !var.config.xray_enable || (length(var.config.xray_private_key) > 0 && length(var.config.xray_public_key) > 0)
+    error_message = "xray_private_key and xray_public_key must be provided when xray_enable is true (generate with: scripts/gen-xray-keys.sh)."
+  }
+
+  # 端口冲突检查
+  # hysteria2 固定占用 443；xray_port 默认也是 443，两者同时启用时必须改 xray_port
+  validation {
+    condition     = !(var.config.hysteria_enable && var.config.xray_enable) || var.config.xray_port != 443
+    error_message = "Port conflict: hysteria2 uses port 443. Set xray_port to a different port when both hysteria_enable and xray_enable are true."
+  }
+
+  # shadowsocks 端口不能与 hysteria2 的固定端口 443 冲突
+  validation {
+    condition     = !(var.config.shadowsocks_enable && var.config.hysteria_enable) || var.config.shadowsocks_libev_port != 443
+    error_message = "Port conflict: hysteria2 uses port 443. Set shadowsocks_libev_port to a different port when both shadowsocks_enable and hysteria_enable are true."
+  }
+
+  # shadowsocks 端口不能与 xray_port 冲突
+  validation {
+    condition     = !(var.config.shadowsocks_enable && var.config.xray_enable) || var.config.shadowsocks_libev_port != var.config.xray_port
+    error_message = "Port conflict: shadowsocks_libev_port and xray_port must not be the same when both protocols are enabled."
   }
 }
