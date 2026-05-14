@@ -1,62 +1,89 @@
 # aws-lightsail-shadowsocks-tf
-use terraform manage shadowsocks on aws lightsail
+使用 Terraform 在 AWS Lightsail 上管理代理节点，支持以下协议：
+
+| 模块 | 协议 | 端口 |
+| --- | --- | --- |
+| `lightsail-shadowsocks` | Shadowsocks-libev | 8388（可配置） |
+| `lightsail-hysteria` | Hysteria2 | 443（固定） |
+| `lightsail-xray` | VLESS + REALITY | 443（可配置） |
+| `lightsail-combined` | 以上三种协议按需组合 | — |
 
 ---
 
 ### 准备工作
-1. aws access key
-2. oss access key
-3. 创建一个 oss bucket
+1. AWS Access Key（用于创建 Lightsail 实例）
+2. 阿里云 OSS Access Key（用于写出配置文件）
+3. 创建一个 OSS Bucket
 
 ### 注意点
-1. 当前 oss backend 需要和 variables.tf 的 alicloud_bucket 指定同一个 bucket
-2. 可以在任意 aws region 内建立多个实例
+1. OSS backend 与 `output_oss_bucket` 变量需指定同一个 Bucket
+2. 可在任意 AWS Region 内创建多个实例
 
 ### 执行命令
 
-```
+```bash
 export AWS_ACCESS_KEY_ID=xxx AWS_SECRET_ACCESS_KEY=xxx
 
 export ALICLOUD_ACCESS_KEY=xxx ALICLOUD_SECRET_KEY=xxx ALICLOUD_REGION=cn-hangzhou ALICLOUD_BUCKET=aws-lightsail-terraform
 
 cp terraform.tfvars.json.example terraform.tfvars.json
+# 编辑 terraform.tfvars.json，填入所需实例配置
 
 terraform init -backend-config="bucket=aws-lightsail-terraform"
 
 terraform apply
 ```
 
-### 执行结果
-> 意外：有几个实例输出几个 oss 配置文件，实例删除时 oss 配置文件也会删除
+#### 使用 Xray VLESS+REALITY 时，需先生成 x25519 密钥对
 
-每个实例的 ip 信息和 shadowsocks 的配置信息会同时写入 OSS 和本地 `outputs/` 目录。
-本地文件由 Terraform 直接生成，不再依赖额外的下载脚本，目录结构如下：
-
-```
-/aws-lightsail-terraform
-  /outputs/shadowsocks-configs
-    /ap-northeast-1
-      /vpn-1.json
-      /vpn-2.json
-  /outputs/hysteria-configs
-    /ap-northeast-1
-      /hy2-1.json
+```bash
+chmod +x scripts/gen-xray-keys.sh
+./scripts/gen-xray-keys.sh
+# 将输出的 Private key / Public key 填入 terraform.tfvars.json
 ```
 
-shadowsocks 本地输出文件位于 `outputs/shadowsocks-configs/${region}-${instance_name}.json`。
+### 输出结果
 
-hysteria2 实例对应的本地输出文件位于 `outputs/hysteria-configs/${region}-${instance_name}.json`，
-其中 `hysteria_url` 字段（`hysteria2://...?sni=...&insecure=1#...`）可直接在
-Shadowrocket / Clash / Clash Verge 中通过 URL 导入。
+每个实例的 IP 与协议配置会同时写入 OSS 和本地 `outputs/` 目录，实例销毁时对应文件自动删除。
+
+```
+outputs/
+  shadowsocks-configs/
+    <region>-<instance_name>.json
+  hysteria-configs/
+    <region>-<instance_name>.json
+  xray-configs/
+    <region>-<instance_name>.json
+  combined-configs/
+    <region>-<instance_name>.json
+```
+
+各输出文件包含实例 IP、协议配置详情以及可直接导入客户端的分享链接：
+
+| 模块 | 分享链接字段 | 格式 |
+| --- | --- | --- |
+| shadowsocks | `shadowsocks_url` | `ss://BASE64@host:port#tag` |
+| hysteria | `hysteria_url` | `hysteria2://pass@host:443?sni=...&insecure=1#tag` |
+| xray | `xray_url` | `vless://uuid@host:443?security=reality&...#tag` |
+| combined | 以上字段按启用协议包含 | — |
+
+`shadowsocks_url`、`hysteria_url`、`xray_url` 均可直接在 **Shadowrocket / Clash / Clash Verge** 中通过 URL 导入，无需手动填写配置。
+
+### 下载 OSS 配置文件
+
+```bash
+chmod +x scripts/download-oss-file.sh
+./scripts/download-oss-file.sh outputs/xray-configs/ap-northeast-1/xray-1.json ./local.json
+```
 
 ### 测试工具
 
-通过 [TCP port check](http://port.ping.pe) 测试实例连接情况
+通过 [TCP port check](http://port.ping.pe) 测试实例连通性。
 
 ### TODO
-- [ ] 输出 oss config file url
+- [ ] 输出 OSS config file URL
 - [x] 一次开启多个地区实例
-- [ ] 一个实例开启多个 shadowsocks
-- [x] 支持 hysteria2
-- [x] 支持 xray
-- [x] 一个实例同时开启 shadowsocks + hysteria2 + xray
+- [ ] 一个实例开启多个 Shadowsocks
+- [x] 支持 Hysteria2
+- [x] 支持 Xray VLESS+REALITY
+- [x] 一个实例同时开启多协议（combined 模块）
