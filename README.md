@@ -83,7 +83,7 @@ chmod +x scripts/download-oss-file.sh
 ### TODO
 - [ ] 输出 OSS config file URL
 - [x] 一次开启多个地区实例
-- [ ] 一个实例开启多个 Shadowsocks
+- [x] 支持 Shadowsocks
 - [x] 支持 Hysteria2
 - [x] 支持 Xray VLESS+REALITY
 - [x] 一个实例同时开启多协议（combined 模块）

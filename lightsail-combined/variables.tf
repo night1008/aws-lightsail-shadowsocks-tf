@@ -31,8 +31,8 @@ variable "config" {
     instance_name                     = "test1"
     availability_zone                 = "ap-northeast-1a"
     create_static_ip                  = true
-    shadowsocks_enable                = true
-    hysteria_enable                   = true
+    shadowsocks_enable                = false
+    hysteria_enable                   = false
     xray_enable                       = false
     shadowsocks_libev_port            = 8388
     shadowsocks_libev_password_length = 10
