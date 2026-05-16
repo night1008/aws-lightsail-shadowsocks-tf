@@ -33,7 +33,7 @@ locals {
   sni                  = split("/", local.proxy_host_with_path)[0]
 
   hysteria_url = var.config.hysteria_enable ? format(
-    "hysteria2://%s@%s:%d?sni=%s&insecure=1#%s",
+    "hysteria2://%s@%s:%d?sni=%s&insecure=1&udp=true#%s",
     urlencode(random_password.hy_password[0].result),
     local.ip_address,
     local.hysteria_port,
