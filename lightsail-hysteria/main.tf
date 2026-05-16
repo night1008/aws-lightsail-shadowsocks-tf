@@ -17,7 +17,7 @@ locals {
   # hysteria2://<password>@<host>:<port>?sni=<sni>&insecure=1&udp=true#<tag>
   # 自签证书需要 insecure=1；udp=true 显式开启 UDP 转发（Hysteria2 默认已支持 UDP）；password 中可能含 @/% 等字符，URL 编码后再拼接
   hysteria_url = format(
-    "hysteria2://%s@%s:%d?sni=%s&insecure=1&udp=true#%s",
+    "hysteria2://%s@%s:%d?sni=%s&insecure=1&udp=1#%s",
     urlencode(random_password.password.result),
     local.ip_address,
     local.hysteria_port,
