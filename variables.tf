@@ -15,15 +15,7 @@ variable "shadowsocks_instances" {
     shadowsocks_libev_password_length = number # shadowsocks-libev password length
     shadowsocks_libev_method          = string # shadowsocks-libev config method
   }))
-  default = [{
-    region                            = "ap-northeast-1"
-    instance_name                     = "vpn-1"
-    availability_zone                 = "ap-northeast-1a"
-    create_static_ip                  = true
-    shadowsocks_libev_port            = 8388
-    shadowsocks_libev_password_length = 10
-    shadowsocks_libev_method          = "chacha20-ietf-poly1305"
-  }]
+  default = []
   validation {
     condition     = length(var.shadowsocks_instances) == length(toset([for s in var.shadowsocks_instances : format("%s-%s", s.region, s.instance_name)]))
     error_message = "The shadowsocks_instances instance_name must be unique on a region."
